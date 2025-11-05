@@ -1,147 +1,136 @@
-
 import java.util.Scanner;
-
 
 public class Hangman {
 
-	public static void main(String[] args) {
-		 Scanner scanr = new Scanner(System.in);
+    public static void main(String[] args) {
+        Scanner scanr = new Scanner(System.in);
 
-	        // Liste prédéfinie de mots
-	        String[] words = {"maison", "ordinateur", "java", "pendu",
-	                          "developpeur", "clavier", "souris", "ecran"};
+        // Tableau contenant les mots possibles à deviner
+        String[] words = {"maison", "ordinateur", "java", "pendu", "clavier", "souris", "ecran"};
 
-	        // Choisir un mot aléatoire
-	        int indexWord = (int)(Math.random() * words.length);
-	        String secretWord = words[indexWord];
+        // Choix aléatoire du mot secret
+        int indexWord = (int)(Math.random() * words.length);
+        String secretWord = words[indexWord];
 
-	        // Variables du jeu
-	        char[] foundLetters = new char[secretWord.length()];
-	        char[] incorrectLetters = new char[10];
-	        int errors = 0;
-	        int correctLetters = 0;
-	        int indexIncorrectLetters = 0;
-	        boolean gameOver = false;
+        // Tableaux pour suivre les lettres trouvées et les lettres incorrectes
+        char[] foundLetters = new char[secretWord.length()];
+        char[] incorrectLetters = new char[10];
 
-	        // Initialiser l'affichage avec des tirets
-	        for (int i = 0; i < foundLetters.length; i++) {
-	            foundLetters[i] = '_';
-	        }
+        int errors = 0;                  // Compteur d’erreurs
+        int correctLetters = 0;          // Nombre de lettres correctes trouvées
+        int indexIncorrectLetters = 0;   // Position d’ajout dans le tableau des lettres incorrectes
+        boolean gameOver = false;        // Booléen pour savoir si la partie est terminée
 
-	        System.out.println("=== JEU DU PENDU ===");
-	        System.out.println("Devinez le mot en proposant des lettres.");
-	        System.out.println("Vous avez droit à 10 erreurs maximum.");
+        // Initialisation du mot affiché avec des tirets
+        for (int i = 0; i < foundLetters.length; i++) {
+            foundLetters[i] = '_';
+        }
 
-	        // Boucle principale du jeu
-	        while (!gameOver) {
-	            // Afficher l'état actuel du mot
-	            System.out.print("\nMot à deviner: ");
-	            for (int i = 0; i < foundLetters.length; i++) {
-	                System.out.print(foundLetters[i] + " ");
-	            }
-	            System.out.println();
+        System.out.println("=== JEU DU PENDU ===");
+        System.out.println("Devinez le mot en proposant des lettres (10 erreurs maximum).");
 
-	            // Afficher les lettres incorrectes si elles existent
-	            if (indexIncorrectLetters > 0) {
-	                System.out.print("Lettres incorrectes: ");
-	                for (int i = 0; i < indexIncorrectLetters; i++) {
-	                    System.out.print(incorrectLetters[i] + " ");
-	                }
-	                System.out.println();
-	            }
+        // Boucle principale du jeu
+        while (!gameOver) {
+            // Affiche le mot avec les lettres déjà trouvées
+            System.out.print("\nMot à deviner: ");
+            for (char c : foundLetters) {
+                System.out.print(c + " ");
+            }
+            System.out.println();
 
-	            // Afficher le nombre d'erreurs
-	            System.out.println("Erreurs: " + errors + "/10");
+            // Affiche les lettres incorrectes si présentes
+            if (indexIncorrectLetters > 0) {
+                System.out.print("Lettres incorrectes: ");
+                for (int i = 0; i < indexIncorrectLetters; i++) {
+                    System.out.print(incorrectLetters[i] + " ");
+                }
+                System.out.println();
+            }
 
-	            // Demander une lettre
-	            System.out.print("Proposez une lettre: ");
-	            String input = scanr.nextLine();
+            System.out.println("Erreurs: " + errors + "/10");
+            System.out.print("Proposez une lettre: ");
 
-	            // Vérifier que l'input est une seule lettre
-	            if (input.length() != 1) {
-	                System.out.println("Veuillez entrer une seule lettre !");
-	                continue;
-	            }
+            // Lecture et conversion directe en minuscule
+            String input = scanr.nextLine().toLowerCase();
 
-	            char letter = input.charAt(0);
+            // Vérifie que l’utilisateur a bien entré une seule lettre
+            if (input.length() != 1) {
+                System.out.println("Veuillez entrer une seule lettre !");
+                continue;
+            }
 
-	            // Convertir en minuscule si nécessaire
-	            if (letter >= 'A' && letter <= 'Z') {
-	                letter = (char)(letter + 32);
-	            }
+            char letter = input.charAt(0);
 
-	            // Vérifier si c'est une lettre valide
-	            if (letter < 'a' || letter > 'z') {
-	                System.out.println("Veuillez entrer une lettre valide !");
-	                continue;
-	            }
+            // Vérifie que la saisie est bien une lettre alphabétique
+            if (letter < 'a' || letter > 'z') {
+                System.out.println("Veuillez entrer une lettre valide !");
+                continue;
+            }
 
-	            // Vérifier si la lettre a déjà été proposée
-	            boolean letterAlreadyProposed = false;
+            // Vérifie si la lettre a déjà été proposée
+            boolean letterAlreadyProposed = false;
 
-	            // Vérifier dans les lettres trouvées
-	            for (int i = 0; i < foundLetters.length; i++) {
-	                if (foundLetters[i] == letter) {
-	                    letterAlreadyProposed = true;
-	                    break;
-	                }
-	            }
+            for (char c : foundLetters) {
+                if (c == letter) {
+                    letterAlreadyProposed = true;
+                    break;
+                }
+            }
 
-	            // Vérifier dans les lettres incorrectes
-	            if (!letterAlreadyProposed) {
-	                for (int i = 0; i < indexIncorrectLetters; i++) {
-	                    if (incorrectLetters[i] == letter) {
-	                        letterAlreadyProposed = true;
-	                        break;
-	                    }
-	                }
-	            }
+            if (!letterAlreadyProposed) {
+                for (int i = 0; i < indexIncorrectLetters; i++) {
+                    if (incorrectLetters[i] == letter) {
+                        letterAlreadyProposed = true;
+                        break;
+                    }
+                }
+            }
 
-	            if (letterAlreadyProposed) {
-	                System.out.println("Vous avez déjà proposé cette lettre !");
-	                continue;
-	            }
+            if (letterAlreadyProposed) {
+                System.out.println("Vous avez déjà proposé cette lettre !");
+                continue;
+            }
 
-	            // Vérifier si la lettre est dans le mot
-	            boolean letterFound = false;
-	            for (int i = 0; i < secretWord.length(); i++) {
-	                if (secretWord.charAt(i) == letter) {
-	                    foundLetters[i] = letter;
-	                    letterFound = true;
-	                    correctLetters++;
-	                }
-	            }
+            // Recherche de la lettre dans le mot secret
+            boolean letterFound = false;
+            for (int i = 0; i < secretWord.length(); i++) {
+                if (secretWord.charAt(i) == letter && foundLetters[i] != letter) {
+                    foundLetters[i] = letter;
+                    letterFound = true;
+                    correctLetters++;
+                }
+            }
 
-	            if (letterFound) {
-	                System.out.println("Bien ! La lettre '" + letter + "' est dans le mot.");
+            // Si la lettre est trouvée
+            if (letterFound) {
+                System.out.println("Bien ! La lettre '" + letter + "' est dans le mot.");
 
-	                // Vérifier si le mot est complètement trouvé
-	                if (correctLetters == secretWord.length()) {
-	                    System.out.println("\n=== FÉLICITATIONS ! ===");
-	                    System.out.println("Vous avez trouvé le mot: " + secretWord);
-	                    gameOver = true;
-	                }
-	            } else {
-	                System.out.println("Dommage ! La lettre '" + letter + "' n'est pas dans le mot.");
-	                incorrectLetters[indexIncorrectLetters] = letter;
-	                indexIncorrectLetters++;
-	                errors++;
+                // Vérifie si le mot est complètement trouvé
+                if (correctLetters == secretWord.length()) {
+                    System.out.println("\n=== FÉLICITATIONS ! ===");
+                    System.out.println("Vous avez trouvé le mot: " + secretWord);
+                    gameOver = true;
+                }
 
-	                // Vérifier si le joueur a perdu
-	                if (errors >= 10) {
-	                    System.out.println("\n=== GAME OVER ===");
-	                    System.out.println("Vous avez atteint 10 erreurs !");
-	                    System.out.println("Le mot était: " + secretWord);
-	                    gameOver = true;
-	                } else {
-	                    System.out.println("Il vous reste " + (10 - errors) + " erreurs possibles.");
-	                }
-	            }
-	        }
+            // Si la lettre n’est pas dans le mot
+            } else {
+                System.out.println("Dommage ! La lettre '" + letter + "' n'est pas dans le mot.");
+                incorrectLetters[indexIncorrectLetters++] = letter;
+                errors++;
 
-	        scanr.close();
-	        System.out.println("\nMerci d'avoir joué !");
+                // Vérifie la fin du jeu (10 erreurs)
+                if (errors >= 10) {
+                    System.out.println("\n=== GAME OVER ===");
+                    System.out.println("Vous avez atteint 10 erreurs !");
+                    System.out.println("Le mot était: " + secretWord);
+                    gameOver = true;
+                } else {
+                    System.out.println("Il vous reste " + (10 - errors) + " erreurs possibles.");
+                }
+            }
+        }
 
-	}
-
+        scanr.close();
+        System.out.println("\nMerci d'avoir joué !");
+    }
 }
